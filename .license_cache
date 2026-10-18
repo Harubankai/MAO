@@ -1,0 +1,27 @@
+{
+    "cached_at": 1792325232,
+    "response": {
+        "success": true,
+        "valid": true,
+        "status": "active",
+        "message": "License is active and valid.",
+        "data": {
+            "client_fingerprint": "7187e98aabd0d2ca04e9f02082820671738d373d1484591734853570373a1125",
+            "client_name": "MAO",
+            "expires_at": "",
+            "license_id": "LIC-A7FD-F400",
+            "nonce": "12794d47124a93d502ad332aedc704d5",
+            "server_time": "1792325229",
+            "status": "active",
+            "valid": "1",
+            "valid_until": "1792325529"
+        },
+        "signature": "Ym0pAGSwTiM4pRAkx0MMndYTv3X0EuiGOFVMTnH4lTEVvlSe0CGAgSHzph+s931hk96PZbjANe1fFDoP1TNDwBXqobCeoZsqbn8iJBsiuc6dXJRlEi0Vy7aCAOMolnoEVdjsEqnO9v6drk20xnoDw8vMiKzeGMPwTeTxIzK5edwtRgpnX+MEy61PMXpl2EemFonxbmfWMC8U7P3wQVtGlPOMkFvsA5b11vTyG27tkEzzDM8nfGKHqH7LgVBtRgUmZbp1HbBvu2lL16RhaZQIHnOpi7ftrAyOVyZbEkbOEm6gGUpWX5taqPtjyw5FoE14UtKzua3et28QzmGyM7qAhA==",
+        "signature_meta": {
+            "algorithm": "SHA256withRSA",
+            "canonical_format": "ksort_pipe_kv_v1",
+            "validity_seconds": 300,
+            "public_verification_key_hash": "aacfd6fa8e5328a240048c80de00d9cb4311ef295fcc53b7df91a179f3a19ef2"
+        }
+    }
+}

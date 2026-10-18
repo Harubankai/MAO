@@ -47,14 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            min-height: 100dvh;
             margin: 0;
+            background: #0d3d22;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-font-smoothing: antialiased;
         }
 
         .login-page {
             width: 100%;
-            height: 100vh;
+            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -64,20 +69,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
+            background-attachment: fixed;
+            padding: 32px 16px;
+            box-sizing: border-box;
         }
 
         /* dark-green overlay for contrast */
         .login-page::before {
             content: '';
-            position: absolute;
+            position: fixed;
             inset: 0;
             background: linear-gradient(
                 to bottom,
-                rgba(5, 30, 14, 0.45) 0%,
-                rgba(5, 30, 14, 0.25) 50%,
-                rgba(5, 30, 14, 0.55) 100%
+                rgba(5, 30, 14, 0.50) 0%,
+                rgba(5, 30, 14, 0.30) 50%,
+                rgba(5, 30, 14, 0.60) 100%
             );
             pointer-events: none;
+            z-index: 1;
         }
 
         /* ── Card ── */
@@ -92,11 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow:
                 0 8px 40px rgba(0, 0, 0, 0.35),
                 inset 0 1px 0 rgba(255,255,255,0.5);
-            padding: 44px 40px 36px;
-            margin: 0 16px;
+            padding: 38px 32px 30px;
+            margin: 0 auto;
             position: relative;
             z-index: 2;
             animation: slideUp 0.5s cubic-bezier(.22,.68,0,1.2) both;
+            box-sizing: border-box;
         }
 
         @keyframes slideUp {
@@ -229,11 +239,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .field-inner input {
             flex: 1;
+            min-width: 0;
             border: none;
             outline: none;
             background: transparent;
             font: inherit;
-            font-size: .95rem;
+            font-size: 16px;
             color: #fff;
             padding: 13px 0 13px 2px;
         }
@@ -341,9 +352,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         @media (max-width: 480px) {
-            .login-card { padding: 28px 20px 24px; }
-            .logo-circle { width: 76px; height: 76px; }
-            .logo-title h1 { font-size: 1.25rem; }
+            .login-page {
+                padding: 24px 12px 24px;
+                justify-content: flex-start;
+            }
+            .login-card {
+                padding: 26px 18px 22px;
+                border-radius: 16px;
+            }
+            .logo-wrap {
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+            .logo-circle {
+                width: 72px;
+                height: 72px;
+            }
+            .logo-title h1 {
+                font-size: 1.3rem;
+            }
+            .logo-subtitle {
+                font-size: 0.82rem;
+            }
+            .tagline {
+                font-size: 0.68rem;
+                line-height: 1.4;
+            }
+            .tagline span {
+                padding: 0 3px;
+            }
+            hr.divider {
+                margin: 14px 0 16px;
+            }
+            .form-heading h2 {
+                font-size: 1.3rem;
+            }
+            .form-heading p {
+                font-size: 0.82rem;
+            }
+            .field {
+                margin-top: 14px;
+            }
+            .btn-login {
+                margin-top: 18px;
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+            .login-footer {
+                padding: 18px 12px 14px;
+            }
+            .footer-office {
+                font-size: 0.82rem;
+            }
+            .footer-tagline {
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>

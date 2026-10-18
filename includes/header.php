@@ -11,7 +11,7 @@ $nav = [
   ['reports.php','Reports','fa-chart-column','reports',''],
   ['logs.php','Activity Logs','fa-clipboard-list','logs','view_logs'],
   ['backup.php','Backup','fa-database','backup','backup'],
-  ['coming-soon.php?m=User+Management','User Management','fa-user-gear','user','manage_users'],
+  ['users/index.php','User Management','fa-user-gear','user','manage_users'],
 ];
 $flash = take_flash();
 ?>
@@ -24,27 +24,32 @@ $flash = take_flash();
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
+    <link rel="stylesheet" href="<?= url('assets/css/style.css?v=' . filemtime(__DIR__ . '/../assets/css/style.css')) ?>">
 </head>
 <body>
 <aside class="sidebar" id="sidebar">
-    <div class="brand"><i class="fa-solid fa-wheat-awn"></i><div><strong>Moncada Agri</strong><small>Farmer Records System</small></div></div>
+    <div class="brand"><img src="<?= url('assets/images/logo.jpg') ?>" alt="Moncada Agri Logo" class="brand-logo" width="38" height="38" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#fff;border:1.5px solid rgba(255,255,255,.3);flex-shrink:0;"><div><strong>Moncada Agri</strong><small>Farmer Records System</small></div></div>
     <nav>
     <?php foreach ($nav as [$href, $label, $icon, $key, $perm]): if ($perm && !can($perm)) continue; ?>
         <a href="<?= url($href) ?>" class="<?= ($active ?? '') === $key ? 'active' : '' ?>">
             <i class="fa-solid <?= $icon ?>"></i><span><?= e($label) ?></span>
-            <?php if ($key === 'user'): ?><em class="soon">Soon</em><?php endif; ?>
         </a>
     <?php endforeach; ?>
     </nav>
+    <div class="sidebar-footer">
+        <a href="<?= url('logout.php') ?>" class="sidebar-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Log out</span>
+        </a>
+    </div>
 </aside>
+<div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
 <div class="main">
     <header class="topbar">
-        <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+        <button type="button" class="menu-btn" id="menuBtn" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
         <div class="topbar-title">Municipal Agriculture Office &middot; Moncada, Tarlac</div>
         <div class="user-box">
             <span><i class="fa-solid fa-circle-user"></i> <?= e($user['full_name'] ?? '') ?> <small class="muted">(<?= e($user['role'] ?? '') ?>)</small></span>
-            <a href="<?= url('logout.php') ?>" class="btn btn-light btn-sm"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
         </div>
     </header>
     <main class="content">
