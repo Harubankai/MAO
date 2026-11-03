@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('success', $id ? 'Crop record updated.' : 'Crop record added.'); redirect('crops/index.php');
     }
 }
-$farms = db()->query('SELECT f.id, f.farm_name, fr.full_name FROM farms f JOIN farmers fr ON fr.id = f.farmer_id ORDER BY fr.full_name, f.farm_name')->fetchAll();
+$farms = db()->query('SELECT f.id, f.farm_name, f.barangay, f.location, fr.full_name FROM farms f JOIN farmers fr ON fr.id = f.farmer_id ORDER BY fr.full_name, f.farm_name')->fetchAll();
 $pageTitle = $id ? 'Edit crop record' : 'Add crop record'; $active = 'crops';
 require __DIR__ . '/../includes/header.php';
 ?>
@@ -36,7 +36,7 @@ require __DIR__ . '/../includes/header.php';
 <?php if (!$farms): ?><div class="alert alert-danger">Add a farm first. Every crop record must be linked to a farm.</div><?php endif; ?>
 <section class="panel"><form method="post" novalidate class="form-grid"><?= csrf_field() ?>
 <div class="full"><label for="farm_id">Farm</label><select id="farm_id" name="farm_id" required><option value="">Select a farm</option>
-<?php foreach ($farms as $r): ?><option value="<?= $r['id'] ?>" <?= (int)$f['farm_id'] === (int)$r['id'] ? 'selected' : '' ?>><?= e($r['full_name']) ?> - <?= e($r['farm_name']) ?></option><?php endforeach; ?></select><?= field_err($errors, 'farm_id') ?></div>
+<?php foreach ($farms as $r): ?><option value="<?= $r['id'] ?>" <?= (int)$f['farm_id'] === (int)$r['id'] ? 'selected' : '' ?>><?= e($r['full_name']) ?> - <?= e($r['farm_name']) ?> (<?= e($r['barangay']) ?><?= !empty($r['location']) ? ' - ' . e($r['location']) : '' ?>)</option><?php endforeach; ?></select><?= field_err($errors, 'farm_id') ?></div>
 <div><label for="crop_type">Crop type</label><input id="crop_type" name="crop_type" list="crops" value="<?= e($f['crop_type']) ?>" maxlength="80" required><datalist id="crops"><option>Rice</option><option>Corn</option><option>Vegetables</option><option>Sugarcane</option></datalist><?= field_err($errors, 'crop_type') ?></div>
 <div><label for="variety">Variety</label><input id="variety" name="variety" value="<?= e($f['variety']) ?>" maxlength="80"><?= field_err($errors, 'variety') ?></div>
 <div><label for="season">Season</label><select id="season" name="season" required><option value="">Select</option><?php foreach (['Wet','Dry'] as $o): ?><option <?= $f['season'] === $o ? 'selected' : '' ?>><?= $o ?></option><?php endforeach; ?></select><?= field_err($errors, 'season') ?></div>

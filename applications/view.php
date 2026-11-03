@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../includes/functions.php';
 require_login();
 $id = (int)($_GET['id'] ?? 0);
-$st = db()->prepare('SELECT a.*, fr.full_name, fr.farmer_id AS fno, f.farm_name, c.crop_type, c.season FROM applications a JOIN farmers fr ON fr.id = a.farmer_id JOIN farms f ON f.id = a.farm_id JOIN crops c ON c.id = a.crop_id WHERE a.id = ?');
+$st = db()->prepare('SELECT a.*, fr.full_name, fr.farmer_id AS fno, f.farm_name, f.barangay, f.location, c.crop_type, c.season FROM applications a JOIN farmers fr ON fr.id = a.farmer_id JOIN farms f ON f.id = a.farm_id JOIN crops c ON c.id = a.crop_id WHERE a.id = ?');
 $st->execute([$id]); $a = $st->fetch();
 if (!$a) { flash('danger', 'Application not found.'); redirect('applications/index.php'); }
 $uid = $_SESSION['user']['id'];
@@ -38,10 +38,17 @@ $docs = db()->prepare('SELECT d.*, u.full_name AS uploader FROM application_docu
 $hist = db()->prepare('SELECT v.*, u.full_name AS who FROM verification_records v LEFT JOIN users u ON u.id = v.changed_by WHERE application_id = ? ORDER BY v.id DESC'); $hist->execute([$id]); $hist = $hist->fetchAll();
 $have = array_column(array_filter($docs, fn($d) => $d['status'] !== 'Rejected'), 'doc_type');
 $missing = array_values(array_diff(REQUIRED_DOCS, $have));
+$dateApproved = null;
+foreach ($hist as $h) {
+    if ($h['new_status'] === 'Approved') {
+        $dateApproved = date('M d, Y', strtotime($h['changed_at']));
+        break;
+    }
+}
 $pageTitle = $a['app_no']; $active = 'insurance';
 require __DIR__ . '/../includes/header.php';
 ?>
-<div class="page-head row"><div><h1><?= e($a['app_no']) ?> <?= badge($a['status']) ?></h1><p class="muted"><?= e($a['full_name']) ?> (<?= e($a['fno']) ?>) &middot; <?= e($a['farm_name']) ?> &middot; <?= e($a['crop_type']) ?>, <?= e($a['season']) ?> season &middot; applied <?= e($a['date_applied']) ?></p></div>
+<div class="page-head row"><div><h1><?= e($a['app_no']) ?> <?= badge($a['status']) ?></h1><p class="muted"><?= e($a['full_name']) ?> (<?= e($a['fno']) ?>) &middot; <?= e($a['farm_name']) ?> (<?= e($a['barangay']) ?><?= !empty($a['location']) ? ' &middot; ' . e($a['location']) : '' ?>) &middot; <?= e($a['crop_type']) ?>, <?= e($a['season']) ?> season &middot; <strong>Date of submit:</strong> <?= e($a['date_applied']) ?><?php if ($dateApproved): ?> &middot; <strong>Date approved:</strong> <span style="color:var(--g700);font-weight:600;"><i class="fa-solid fa-circle-check"></i> <?= e($dateApproved) ?></span><?php elseif ($a['status'] === 'Approved'): ?> &middot; <strong>Date approved:</strong> <span style="color:var(--g700);font-weight:600;"><i class="fa-solid fa-circle-check"></i> Approved</span><?php endif; ?></p></div>
 <a class="btn btn-light" href="index.php">Back to list</a></div>
 
 <section class="panel"><h2>Requirements checklist</h2>

@@ -7,11 +7,12 @@ $id = (int)($_GET['id'] ?? 0);
 $u = [
     'username' => '',
     'full_name' => '',
+    'email'    => '',
     'role' => 'staff'
 ];
 
 if ($id) {
-    $st = db()->prepare('SELECT id, username, full_name, role, created_at FROM users WHERE id = ?');
+    $st = db()->prepare('SELECT id, username, full_name, email, role, created_at FROM users WHERE id = ?');
     $st->execute([$id]);
     $u = $st->fetch();
     if (!$u) {
@@ -27,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $u['username'] = trim($_POST['username'] ?? '');
     $u['full_name'] = trim($_POST['full_name'] ?? '');
+    $u['email']     = trim($_POST['email'] ?? '');
     $u['role'] = trim($_POST['role'] ?? '');
     $password = $_POST['password'] ?? '';
     $password_confirm = $_POST['password_confirm'] ?? '';
@@ -49,6 +51,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['full_name'] = 'Full name is required (up to 120 characters).';
     }
 
+    // Validation: Email (required, must be valid, must be unique)
+    if ($u['email'] === '') {
+        $errors['email'] = 'Email address is required.';
+    } elseif (!filter_var($u['email'], FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Please enter a valid email address.';
+    } else {
+        $dupEmail = db()->prepare('SELECT id FROM users WHERE email = ? AND id <> ?');
+        $dupEmail->execute([$u['email'], $id]);
+        if ($dupEmail->fetch()) {
+            $errors['email'] = 'This email is already used by another account.';
+        }
+    }
+
     // Validation: Role
     if (!in_array($u['role'], ['admin', 'staff'], true)) {
         $errors['role'] = 'Please select a valid role.';
@@ -67,16 +82,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // New user requires password
         if ($password === '') {
             $errors['password'] = 'Password is required for new accounts.';
-        } elseif (strlen($password) < 6) {
-            $errors['password'] = 'Password must be at least 6 characters.';
+        } elseif (strlen($password) > 8) {
+            $errors['password'] = 'Password must be at most 8 characters.';
+        } elseif (!preg_match('/[A-Z]/', $password)) {
+            $errors['password'] = 'Password must contain at least 1 uppercase letter.';
         } elseif ($password !== $password_confirm) {
             $errors['password_confirm'] = 'Passwords do not match.';
         }
     } else {
         // Editing: password is optional
         if ($password !== '') {
-            if (strlen($password) < 6) {
-                $errors['password'] = 'Password must be at least 6 characters.';
+            if (strlen($password) > 8) {
+                $errors['password'] = 'Password must be at most 8 characters.';
+            } elseif (!preg_match('/[A-Z]/', $password)) {
+                $errors['password'] = 'Password must contain at least 1 uppercase letter.';
             } elseif ($password !== $password_confirm) {
                 $errors['password_confirm'] = 'Passwords do not match.';
             }
@@ -87,11 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id) {
             if ($password !== '') {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
-                $upSt = db()->prepare('UPDATE users SET username = ?, full_name = ?, role = ?, password_hash = ? WHERE id = ?');
-                $upSt->execute([$u['username'], $u['full_name'], $u['role'], $hash, $id]);
+                $upSt = db()->prepare('UPDATE users SET username = ?, full_name = ?, email = ?, role = ?, password_hash = ? WHERE id = ?');
+                $upSt->execute([$u['username'], $u['full_name'], $u['email'] ?: null, $u['role'], $hash, $id]);
             } else {
-                $upSt = db()->prepare('UPDATE users SET username = ?, full_name = ?, role = ? WHERE id = ?');
-                $upSt->execute([$u['username'], $u['full_name'], $u['role'], $id]);
+                $upSt = db()->prepare('UPDATE users SET username = ?, full_name = ?, email = ?, role = ? WHERE id = ?');
+                $upSt->execute([$u['username'], $u['full_name'], $u['email'] ?: null, $u['role'], $id]);
             }
 
             // If current user updated their own profile, sync session
@@ -105,8 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('success', 'User "' . e($u['username']) . '" updated successfully.');
         } else {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $inSt = db()->prepare('INSERT INTO users (username, password_hash, full_name, role, created_at) VALUES (?, ?, ?, ?, NOW())');
-            $inSt->execute([$u['username'], $hash, $u['full_name'], $u['role']]);
+            $inSt = db()->prepare('INSERT INTO users (username, password_hash, full_name, email, role, created_at) VALUES (?, ?, ?, ?, ?, NOW())');
+            $inSt->execute([$u['username'], $hash, $u['full_name'], $u['email'], $u['role']]);
             $newId = (int)db()->lastInsertId();
 
             log_activity('Created user', 'user', $newId, $u['username']);
@@ -157,15 +176,21 @@ function uerr(array $errors, string $k): string {
             <?= uerr($errors, 'full_name') ?>
         </div>
 
+        <div class="full">
+            <label for="email">Gmail Address <span class="muted" style="font-weight:normal">(used for login &amp; password reset)</span></label>
+            <input type="email" id="email" name="email" value="<?= e($u['email'] ?? '') ?>" placeholder="e.g. juan@gmail.com" maxlength="180" required>
+            <?= uerr($errors, 'email') ?>
+        </div>
+
         <div>
             <label for="password"><?= $editing ? 'New Password <span class="muted" style="font-weight:normal">(optional)</span>' : 'Password' ?></label>
-            <input type="password" id="password" name="password" placeholder="<?= $editing ? 'Leave blank to keep current' : 'At least 6 characters' ?>" autocomplete="new-password">
+            <input type="password" id="password" name="password" placeholder="<?= $editing ? 'Leave blank to keep current' : 'Max 8 chars, 1 uppercase' ?>" autocomplete="new-password" maxlength="8">
             <?= uerr($errors, 'password') ?>
         </div>
 
         <div>
             <label for="password_confirm">Confirm Password</label>
-            <input type="password" id="password_confirm" name="password_confirm" placeholder="Re-type password" autocomplete="new-password">
+            <input type="password" id="password_confirm" name="password_confirm" placeholder="Re-type password" autocomplete="new-password" maxlength="8">
             <?= uerr($errors, 'password_confirm') ?>
         </div>
 

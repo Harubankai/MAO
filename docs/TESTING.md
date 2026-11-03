@@ -8,3 +8,4 @@
 - Security: submit forms without the csrf token (blocked); try `' OR 1=1 --` in search (no effect); `<script>` in names shows as text.
 - Backup: download, restore into a test database, compare row counts.
 - Responsive: check at 375px, 768px, 1280px widths.
+- Farmer approval: import `database/farmer_approval.sql`. As staff, register a farmer (status Pending Approval); admin has no Register/Edit buttons and `/farmers/form.php` returns 403. As admin, reject without a reason (blocked), reject with a reason, then staff sees the reason, corrects and resubmits; admin approves. Staff POST to `/farmers/approve.php` returns 403. Approval history shows each action with user and time.

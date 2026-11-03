@@ -79,16 +79,16 @@ $currentUserId = (int)($user['id'] ?? 0);
 </div>
 
 <section class="panel">
-    <form method="get" class="search">
+    <form method="get" class="search" id="userSearchForm">
         <input type="search" name="q" value="<?= e($q) ?>" placeholder="Search by username or full name">
-        <select name="role" style="max-width:180px;">
+        <select name="role" style="min-width:160px;" onchange="this.form.submit()" id="roleFilter">
             <option value="">All Roles</option>
             <option value="admin" <?= $roleFilter === 'admin' ? 'selected' : '' ?>>Administrator</option>
             <option value="staff" <?= $roleFilter === 'staff' ? 'selected' : '' ?>>Staff</option>
         </select>
         <button class="btn btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
         <?php if ($q !== '' || $roleFilter !== ''): ?>
-            <a class="btn btn-light" href="index.php">Clear</a>
+            <a class="btn btn-light" href="index.php"><i class="fa-solid fa-xmark"></i> Clear filter</a>
         <?php endif; ?>
     </form>
 

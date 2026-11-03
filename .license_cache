@@ -1,5 +1,5 @@
 {
-    "cached_at": 1792325232,
+    "cached_at": 1792762467,
     "response": {
         "success": true,
         "valid": true,
@@ -10,13 +10,13 @@
             "client_name": "MAO",
             "expires_at": "",
             "license_id": "LIC-A7FD-F400",
-            "nonce": "12794d47124a93d502ad332aedc704d5",
-            "server_time": "1792325229",
+            "nonce": "42244eafe8dc049eb8a29bec78158403",
+            "server_time": "1792762465",
             "status": "active",
             "valid": "1",
-            "valid_until": "1792325529"
+            "valid_until": "1792762765"
         },
-        "signature": "Ym0pAGSwTiM4pRAkx0MMndYTv3X0EuiGOFVMTnH4lTEVvlSe0CGAgSHzph+s931hk96PZbjANe1fFDoP1TNDwBXqobCeoZsqbn8iJBsiuc6dXJRlEi0Vy7aCAOMolnoEVdjsEqnO9v6drk20xnoDw8vMiKzeGMPwTeTxIzK5edwtRgpnX+MEy61PMXpl2EemFonxbmfWMC8U7P3wQVtGlPOMkFvsA5b11vTyG27tkEzzDM8nfGKHqH7LgVBtRgUmZbp1HbBvu2lL16RhaZQIHnOpi7ftrAyOVyZbEkbOEm6gGUpWX5taqPtjyw5FoE14UtKzua3et28QzmGyM7qAhA==",
+        "signature": "mslmkXZ1NZVR7efuyF7LP6bQMNdgnfY19xlH2FbiqAdWNaoe7h7elO5dK22h4lag5hujA3MQyD8OUc0M3t1SQou8k8VekQymCl6lCfPel6QjU+Msh4IUzrZ5qrnPzzs2Emt6Qup8IIlRYcZl5r0rYhRWbkQ8lT7jIjcfj8FO/JIYMAL4wyEc9zvOUz6lrkd0/FcvKdYa0LI/ZVf4PfWGTs+AlcHki2Ji1kDIUZlDA+YeylOqTidwR/tzznkkH4BFQBK6zKJ2nYEWSzH3+lHpf/hjLu1TU3vzhgIKAGTXanFF1vEE5YS0DNQw/7mvi619qPLsqVBi5DlSdL3ae8gHgw==",
         "signature_meta": {
             "algorithm": "SHA256withRSA",
             "canonical_format": "ksort_pipe_kv_v1",

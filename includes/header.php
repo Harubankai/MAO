@@ -28,7 +28,7 @@ $flash = take_flash();
 </head>
 <body>
 <aside class="sidebar" id="sidebar">
-    <div class="brand"><img src="<?= url('assets/images/logo.jpg') ?>" alt="Moncada Agri Logo" class="brand-logo" width="38" height="38" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#fff;border:1.5px solid rgba(255,255,255,.3);flex-shrink:0;"><div><strong>Moncada Agri</strong><small>Farmer Records System</small></div></div>
+    <div class="brand"><img src="<?= url('assets/images/logo.jpg') ?>?v=<?= @filemtime(dirname(__DIR__) . '/assets/images/logo.jpg') ?>" alt="Moncada Agri Logo" class="brand-logo" width="38" height="38" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#fff;border:1.5px solid rgba(255,255,255,.3);flex-shrink:0;"><div><strong>Moncada Agri</strong><small>Farmer Records System</small></div></div>
     <nav>
     <?php foreach ($nav as [$href, $label, $icon, $key, $perm]): if ($perm && !can($perm)) continue; ?>
         <a href="<?= url($href) ?>" class="<?= ($active ?? '') === $key ? 'active' : '' ?>">
@@ -37,13 +37,31 @@ $flash = take_flash();
     <?php endforeach; ?>
     </nav>
     <div class="sidebar-footer">
-        <a href="<?= url('logout.php') ?>" class="sidebar-logout">
+        <button type="button" class="sidebar-logout" id="logoutBtn" aria-label="Log out">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span>Log out</span>
-        </a>
+        </button>
     </div>
 </aside>
 <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+<!-- Logout confirmation modal -->
+<div class="modal" id="logoutModal" hidden role="dialog" aria-modal="true" aria-labelledby="lm-title">
+    <div class="modal-box" style="text-align:center;max-width:380px;">
+      
+        <h3 id="lm-title" style="margin:0 0 8px;font-size:1.15rem;">Log out?</h3>
+        <p style="color:var(--mu);margin:0 0 20px;font-size:.92rem;">You are logged in as <strong><?= e($user['full_name'] ?? 'you') ?></strong>. Are you sure you want to end your session?</p>
+        <div class="modal-actions" style="justify-content:center;gap:12px;">
+            <button type="button" class="btn btn-light" id="lm-cancel" style="min-width:100px;">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+            <a href="<?= url('logout.php') ?>" class="btn btn-danger" style="min-width:100px;">
+                <i class="fa-solid fa-right-from-bracket"></i> Log out
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="main">
     <header class="topbar">
         <button type="button" class="menu-btn" id="menuBtn" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>

@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 $farmers = db()->query('SELECT id, farmer_id, full_name FROM farmers ORDER BY full_name')->fetchAll();
-$farms = db()->query('SELECT id, farmer_id, farm_name FROM farms')->fetchAll();
+$farms = db()->query('SELECT id, farmer_id, farm_name, barangay, location FROM farms')->fetchAll();
 $crops = db()->query('SELECT id, farm_id, crop_type, season, planting_date FROM crops')->fetchAll();
 $pageTitle = 'New application'; $active = 'insurance';
 require __DIR__ . '/../includes/header.php';
@@ -38,7 +38,7 @@ require __DIR__ . '/../includes/header.php';
 <?php foreach ($farmers as $r): ?><option value="<?= $r['id'] ?>" <?= $f['farmer_id'] === (int)$r['id'] ? 'selected' : '' ?>><?= e($r['full_name']) ?> (<?= e($r['farmer_id']) ?>)</option><?php endforeach; ?></select></div>
 <div><label for="farm_id">Farm</label><select id="farm_id" name="farm_id" required></select><?= field_err($errors, 'farm_id') ?></div>
 <div><label for="crop_id">Crop record</label><select id="crop_id" name="crop_id" required></select><?= field_err($errors, 'crop_id') ?></div>
-<div><label for="date_applied">Date applied</label><input type="date" id="date_applied" name="date_applied" value="<?= e($f['date_applied']) ?>" max="<?= date('Y-m-d') ?>" required><?= field_err($errors, 'date_applied') ?></div>
+<div><label for="date_applied">Date of submit</label><input type="date" id="date_applied" name="date_applied" value="<?= e($f['date_applied']) ?>" max="<?= date('Y-m-d') ?>" required><?= field_err($errors, 'date_applied') ?></div>
 <div class="full"><label for="remarks">Remarks (optional)</label><input id="remarks" name="remarks" value="<?= e($f['remarks']) ?>" maxlength="500"><?= field_err($errors, 'remarks') ?></div>
 <div class="full form-actions"><button class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Record application</button><a class="btn btn-light" href="index.php">Cancel</a></div>
 </form></section>
@@ -49,7 +49,7 @@ function fill(sel, rows, label, keep, empty) {
   sel.innerHTML = '<option value="">' + empty + '</option>';
   rows.forEach(r => { const o = document.createElement('option'); o.value = r.id; o.textContent = label(r); if (+r.id === keep) o.selected = true; sel.appendChild(o); });
 }
-function farms() { fill(fa, FARMS.filter(x => x.farmer_id == fe.value), r => r.farm_name, SEL.farm, fe.value ? 'Select a farm' : 'Select a farmer first'); crops(); }
+function farms() { fill(fa, FARMS.filter(x => x.farmer_id == fe.value), r => r.farm_name + ' (' + r.barangay + (r.location ? ' - ' + r.location : '') + ')', SEL.farm, fe.value ? 'Select a farm' : 'Select a farmer first'); crops(); }
 function crops() { fill(cr, CROPS.filter(x => x.farm_id == fa.value), r => r.crop_type + ' (' + r.season + ', planted ' + r.planting_date + ')', SEL.crop, fa.value ? 'Select a crop record' : 'Select a farm first'); }
 fe.addEventListener('change', () => { SEL.farm = 0; SEL.crop = 0; farms(); }); fa.addEventListener('change', () => { SEL.crop = 0; crops(); }); farms();
 </script>

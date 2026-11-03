@@ -6,18 +6,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     $u = trim($_POST['username'] ?? '');
     $p = $_POST['password'] ?? '';
-    $st = db()->prepare('SELECT * FROM users WHERE username = ?');
-    $st->execute([$u]);
-    $row = $st->fetch();
-    if ($row && password_verify($p, $row['password_hash'])) {
-        session_regenerate_id(true);
-        $_SESSION['user'] = ['id' => $row['id'], 'username' => $row['username'], 'full_name' => $row['full_name'], 'role' => $row['role']];
-        db()->prepare('UPDATE users SET last_login = NOW() WHERE id = ?')->execute([$row['id']]);
-        log_activity('Login');
-        redirect('index.php');
+    if (strlen($p) > 8) {
+        $error = 'Password must be at most 8 characters.';
+    } else {
+        $st = db()->prepare('SELECT * FROM users WHERE username = ? OR email = ?');
+        $st->execute([$u, $u]);
+        $row = $st->fetch();
+        if ($row && password_verify($p, $row['password_hash'])) {
+            session_regenerate_id(true);
+            $_SESSION['user'] = ['id' => $row['id'], 'username' => $row['username'], 'full_name' => $row['full_name'], 'role' => $row['role']];
+            db()->prepare('UPDATE users SET last_login = NOW() WHERE id = ?')->execute([$row['id']]);
+            log_activity('Login');
+            redirect('index.php');
+        }
+        log_activity('Failed login', null, null, 'username: ' . mb_substr($u, 0, 50));
+        $error = 'Incorrect username or password.';
     }
-    log_activity('Failed login', null, null, 'username: ' . mb_substr($u, 0, 50));
-    $error = 'Incorrect username or password.';
 }
 ?>
 <!DOCTYPE html>
@@ -417,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Logo + Branding -->
         <div class="logo-wrap">
             <div class="logo-circle">
-                <img src="<?= url('assets/images/logo.jpg') ?>" alt="Moncada Agriculture Office Logo">
+                <img src="<?= url('assets/images/logo.jpg') ?>?v=<?= @filemtime(__DIR__ . '/assets/images/logo.jpg') ?>" alt="Moncada Agriculture Office Logo">
             </div>
             <div class="logo-title">
                 <h1>Moncada, Tarlac</h1>
@@ -454,10 +458,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="field">
                 <div class="field-inner">
-                    <span class="field-icon"><i class="fa-regular fa-user"></i></span>
+                    <span class="field-icon"><i class="fa-regular fa-envelope"></i></span>
                     <input type="text" id="username" name="username"
                            value="<?= e($_POST['username'] ?? '') ?>"
-                           placeholder="Username" required autofocus>
+                           placeholder="Username or Gmail" required autofocus>
                 </div>
             </div>
 
@@ -465,7 +469,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="field-inner">
                     <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
                     <input type="password" id="password" name="password"
-                           placeholder="Password" required>
+                           placeholder="Password" maxlength="8" required>
                     <button type="button" class="field-toggle" id="togglePw" aria-label="Toggle password visibility">
                         <i class="fa-regular fa-eye" id="eyeIcon"></i>
                     </button>
@@ -479,7 +483,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <div class="forgot">
-            <a href="#">Forgot password?</a>
+            <a href="<?= url('forgot-password.php') ?>">Forgot password?</a>
         </div>
     </div>
 
